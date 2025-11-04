@@ -1,0 +1,196 @@
+{
+	"sample_user": {
+		"email": "john.developer@company.com",
+		"full_name": "John Developer",
+		"role": "user",
+		"my_why": "I want to stay current with technology trends and become a better team lead. Continuous learning helps me solve complex problems and mentor junior developers effectively.",
+		"about_me": "Senior Angular developer with 5 years experience. Passionate about clean code, user experience, and building scalable applications. Currently working on improving my leadership and communication skills.",
+		"current_hard_skill": "Angular Advanced Patterns",
+		"current_soft_skill": "Team Leadership",
+		"notification_preferences": {
+			"enable_web_push": true,
+			"enable_email": true,
+			"lunchtime_reminders": true,
+			"review_reminders": true,
+			"preferred_time": "12:30",
+			"timezone": "America/New_York"
+		},
+		"review_period_months": 6
+	},
+
+	"sample_training_items": [
+		{
+			"title": "Angular Performance Optimization",
+			"description": "Learn advanced techniques for optimizing Angular applications including OnPush strategy, lazy loading, and bundle optimization.",
+			"category": "technical",
+			"skill_type": "hard_skill",
+			"difficulty_level": "advanced",
+			"estimated_duration_minutes": 120,
+			"status": "in_progress",
+			"progress_percentage": 65,
+			"source": "manual",
+			"tags": ["angular", "performance", "optimization"],
+			"level": 0,
+			"order_index": 0
+		},
+		{
+			"title": "OnPush Change Detection",
+			"description": "Deep dive into OnPush change detection strategy and its performance benefits.",
+			"category": "technical",
+			"skill_type": "hard_skill",
+			"difficulty_level": "intermediate",
+			"estimated_duration_minutes": 45,
+			"status": "completed",
+			"progress_percentage": 100,
+			"source": "manual",
+			"tags": ["angular", "change-detection", "performance"],
+			"level": 1,
+			"order_index": 0
+		},
+		{
+			"title": "Effective Communication Techniques",
+			"description": "Learn how to communicate technical concepts clearly to non-technical stakeholders.",
+			"category": "communication",
+			"skill_type": "soft_skill",
+			"difficulty_level": "intermediate",
+			"estimated_duration_minutes": 90,
+			"status": "in_progress",
+			"progress_percentage": 40,
+			"source": "manual",
+			"tags": ["communication", "leadership", "stakeholder-management"],
+			"level": 0,
+			"order_index": 1
+		},
+		{
+			"title": "Active Listening Skills",
+			"description": "Develop active listening techniques for better team collaboration.",
+			"category": "communication",
+			"skill_type": "soft_skill",
+			"difficulty_level": "beginner",
+			"estimated_duration_minutes": 30,
+			"status": "not_started",
+			"progress_percentage": 0,
+			"source": "roadmap_sh",
+			"source_url": "https://roadmap.sh/soft-skills",
+			"tags": ["communication", "listening", "collaboration"],
+			"level": 1,
+			"order_index": 0
+		}
+	],
+
+	"sample_review_period": {
+		"year": 2024,
+		"period_number": 2,
+		"start_date": "2024-07-01",
+		"end_date": "2024-12-31",
+		"status": "in_progress",
+		"hard_skill_focus": "Angular Advanced Patterns",
+		"soft_skill_focus": "Team Leadership",
+		"goals": ["Master Angular performance optimization techniques", "Complete leadership communication course", "Mentor 2 junior developers", "Lead 1 technical presentation"],
+		"total_items": 8,
+		"completed_items": 3,
+		"total_estimated_minutes": 480,
+		"actual_minutes_spent": 320
+	},
+
+	"sample_roadmap_import": {
+		"title": "Frontend Developer Roadmap",
+		"description": "Complete roadmap for frontend development from roadmap.sh",
+		"category": "Frontend Development",
+		"difficulty_level": "Intermediate",
+		"estimated_weeks": 20,
+		"source": "roadmap_sh",
+		"source_url": "https://roadmap.sh/frontend",
+		"source_id": "frontend-2024",
+		"is_public": true,
+		"items": [
+			{
+				"title": "HTML & CSS Fundamentals",
+				"description": "Master HTML5 semantic elements and CSS3 features",
+				"category": "Web Technologies",
+				"level": 0,
+				"order_index": 0,
+				"estimated_hours": 15,
+				"skills_gained": ["HTML5", "CSS3", "Semantic Web", "Responsive Design"],
+				"learning_resources": [
+					{
+						"title": "MDN HTML Documentation",
+						"url": "https://developer.mozilla.org/en-US/docs/Web/HTML",
+						"type": "documentation",
+						"is_free": true,
+						"estimated_minutes": 240
+					},
+					{
+						"title": "CSS Grid and Flexbox Course",
+						"url": "https://cssgrid.io",
+						"type": "course",
+						"is_free": true,
+						"estimated_minutes": 180
+					}
+				]
+			},
+			{
+				"title": "JavaScript ES6+",
+				"description": "Modern JavaScript features and best practices",
+				"category": "Programming Language",
+				"level": 0,
+				"order_index": 1,
+				"estimated_hours": 25,
+				"prerequisites": ["HTML & CSS Fundamentals"],
+				"skills_gained": ["ES6+", "Async/Await", "Modules", "Arrow Functions"],
+				"learning_resources": [
+					{
+						"title": "JavaScript.info Tutorial",
+						"url": "https://javascript.info",
+						"type": "tutorial",
+						"is_free": true,
+						"estimated_minutes": 600
+					}
+				]
+			}
+		]
+	},
+
+	"sample_team_comments": [
+		{
+			"comment": "Great progress on the Angular performance optimization! The implementation of OnPush strategy in the recent project showed measurable improvements. Consider documenting your learnings for the team.",
+			"comment_type": "feedback",
+			"visibility": "shared",
+			"rating": 4
+		},
+		{
+			"comment": "Your communication during the client presentation was much clearer than before. The technical concepts were well explained. Keep practicing with the active listening techniques we discussed.",
+			"comment_type": "encouragement",
+			"visibility": "shared",
+			"rating": 5
+		},
+		{
+			"comment": "Consider focusing more on practical application of leadership concepts. Maybe volunteer to lead the next sprint planning meeting?",
+			"comment_type": "suggestion",
+			"visibility": "shared"
+		}
+	],
+
+	"speckit_import_example": [
+		{
+			"task_id": "SPEC-001",
+			"title": "API Integration Testing",
+			"description": "Learn best practices for testing API integrations in Angular applications",
+			"category": "Testing",
+			"priority": "High",
+			"estimated_hours": 3,
+			"tags": "angular,testing,api,integration",
+			"skill_area": "technical"
+		},
+		{
+			"task_id": "SPEC-002",
+			"title": "Conflict Resolution Workshop",
+			"description": "Attend workshop on resolving technical disagreements in development teams",
+			"category": "Professional Development",
+			"priority": "Medium",
+			"estimated_hours": 2,
+			"tags": "leadership,communication,conflict-resolution",
+			"skill_area": "soft_skills"
+		}
+	]
+}

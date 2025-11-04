@@ -1,0 +1,65 @@
+{
+	"version": 2,
+	"name": "micro-learning-framework",
+	"builds": [
+		{
+			"src": "micro-learning-app/package.json",
+			"use": "@vercel/static-build",
+			"config": {
+				"distDir": "dist/micro-learning-app/browser"
+			}
+		}
+	],
+	"routes": [
+		{
+			"handle": "filesystem"
+		},
+		{
+			"src": "/.*",
+			"dest": "/index.html"
+		}
+	],
+	"env": {
+		"SUPABASE_URL": "@supabase-url",
+		"SUPABASE_ANON_KEY": "@supabase-anon-key"
+	},
+	"build": {
+		"env": {
+			"SUPABASE_URL": "@supabase-url",
+			"SUPABASE_ANON_KEY": "@supabase-anon-key"
+		}
+	},
+	"functions": {},
+	"headers": [
+		{
+			"source": "/service-worker.js",
+			"headers": [
+				{
+					"key": "Cache-Control",
+					"value": "public, max-age=0, must-revalidate"
+				}
+			]
+		},
+		{
+			"source": "/(.*)",
+			"headers": [
+				{
+					"key": "X-Frame-Options",
+					"value": "DENY"
+				},
+				{
+					"key": "X-Content-Type-Options",
+					"value": "nosniff"
+				},
+				{
+					"key": "Referrer-Policy",
+					"value": "strict-origin-when-cross-origin"
+				},
+				{
+					"key": "Permissions-Policy",
+					"value": "camera=(), microphone=(), geolocation=()"
+				}
+			]
+		}
+	]
+}

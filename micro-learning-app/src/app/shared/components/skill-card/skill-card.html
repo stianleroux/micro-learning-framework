@@ -1,0 +1,56 @@
+<div class="skill-card" (click)="onSkillClick()" [class.completed]="skill.isCompleted()">
+  <div class="skill-header">
+    <h3 class="skill-title">{{ skill.title }}</h3>
+    <span class="skill-type" [class]="'skill-type--' + skill.skill_type">
+      {{ skill.skill_type.replace('_', ' ') | titlecase }}
+    </span>
+  </div>
+
+  <p *ngIf="skill.description" class="skill-description">
+    {{ skill.description }}
+  </p>
+
+  <div class="skill-progress">
+    <div class="progress-section">
+      <app-progress-bar
+        [percentage]="skill.progress_percentage"
+        [color]="skill.isCompleted() ? '#28a745' : '#007bff'"
+        height="12px"
+        [animated]="skill.status === 'in_progress'"
+      >
+      </app-progress-bar>
+      <span class="progress-label">{{ skill.progress_percentage }}% Complete</span>
+    </div>
+  </div>
+
+  <div class="skill-meta">
+    <div class="meta-item">
+      <span class="meta-label">Estimated time:</span>
+      <span class="meta-value">{{ getEstimatedTimeText() }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Last practiced:</span>
+      <span class="meta-value">{{ getLastPracticeText() }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Difficulty:</span>
+      <span class="meta-value difficulty" [class]="'difficulty--' + skill.difficulty_level">
+        {{ skill.difficulty_level | titlecase }}
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="showActions" class="skill-actions">
+    <button
+      class="btn btn-primary"
+      (click)="onPracticeClick($event)"
+      [disabled]="skill.isCompleted()"
+    >
+      {{ skill.isCompleted() ? 'Completed' : 'Practice Now' }}
+    </button>
+  </div>
+
+  <div *ngIf="skill.tags.length > 0" class="skill-tags">
+    <span *ngFor="let tag of skill.tags" class="tag">{{ tag }}</span>
+  </div>
+</div>

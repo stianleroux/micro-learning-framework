@@ -1,0 +1,357 @@
+<div class="learning-tree-container">
+  <!-- Header and Controls -->
+  <div class="tree-header">
+    <div class="header-content">
+      <h2>📚 Learning Roadmap</h2>
+      <p>Manage your skills and track progress with an interactive tree structure</p>
+    </div>
+
+    <div class="tree-controls">
+      <!-- Search -->
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search items..."
+          [value]="treeState().searchQuery"
+          (input)="updateSearchQuery($any($event.target).value)"
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-controls">
+        <select
+          [value]="treeState().filterByCategory || ''"
+          (change)="
+            setFilterCategory($any($event.target).value === '' ? null : $any($event.target).value)
+          "
+          class="category-filter"
+        >
+          <option value="">All Categories</option>
+          <option [value]="SkillCategory.TECHNICAL">💻 Technical</option>
+          <option [value]="SkillCategory.LEADERSHIP">👑 Leadership</option>
+          <option [value]="SkillCategory.COMMUNICATION">💬 Communication</option>
+          <option [value]="SkillCategory.PROBLEM_SOLVING">🧩 Problem Solving</option>
+          <option [value]="SkillCategory.CREATIVITY">🎨 Creativity</option>
+          <option [value]="SkillCategory.PROJECT_MANAGEMENT">📋 Project Management</option>
+          <option [value]="SkillCategory.COLLABORATION">🤝 Collaboration</option>
+          <option [value]="SkillCategory.LEARNING">📚 Learning</option>
+        </select>
+
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [checked]="treeState().showCompleted"
+            (change)="toggleShowCompleted()"
+          />
+          Show Completed
+        </label>
+      </div>
+
+      <!-- Add Root Item -->
+      <button class="btn btn-primary add-root-btn" (click)="addRootNode()">
+        ➕ Add Learning Path
+      </button>
+    </div>
+  </div>
+
+  <!-- Tree View -->
+  <div class="tree-content">
+    <div class="tree-nodes" *ngIf="treeState().rootNodes.length > 0">
+      <ng-container *ngFor="let node of treeState().rootNodes">
+        <div *ngIf="isNodeVisible(node)" class="tree-node-wrapper">
+          <ng-container
+            *ngTemplateOutlet="nodeTemplate; context: { $implicit: node }"
+          ></ng-container>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="empty-state" *ngIf="treeState().rootNodes.length === 0">
+      <div class="empty-icon">🌱</div>
+      <h3>Start Your Learning Journey</h3>
+      <p>Create your first learning path or import from roadmap.sh</p>
+      <div class="empty-actions">
+        <button class="btn btn-primary" (click)="addRootNode()">➕ Create Learning Path</button>
+        <a routerLink="/import" class="btn btn-secondary"> 📥 Import Roadmap </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Item Form Modal -->
+  <div class="modal-overlay" *ngIf="newItemForm().parentId !== null || newItemForm().title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ newItemForm().parentId ? 'Add Child Item' : 'Add Learning Path' }}</h3>
+        <button class="modal-close" (click)="closeNewItemForm()">✕</button>
+      </div>
+
+      <form class="new-item-form" (ngSubmit)="createNewItem()">
+        <div class="form-group">
+          <label for="title">Title *</label>
+          <input
+            id="title"
+            type="text"
+            [(ngModel)]="newItemForm().title"
+            name="title"
+            required
+            placeholder="Enter learning item title..."
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="newItemForm().description"
+            name="description"
+            placeholder="Describe what you'll learn..."
+            rows="3"
+            class="form-textarea"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              [(ngModel)]="newItemForm().category"
+              name="category"
+              class="form-select"
+            >
+              <option [value]="SkillCategory.TECHNICAL">💻 Technical</option>
+              <option [value]="SkillCategory.LEADERSHIP">👑 Leadership</option>
+              <option [value]="SkillCategory.COMMUNICATION">💬 Communication</option>
+              <option [value]="SkillCategory.PROBLEM_SOLVING">🧩 Problem Solving</option>
+              <option [value]="SkillCategory.CREATIVITY">🎨 Creativity</option>
+              <option [value]="SkillCategory.PROJECT_MANAGEMENT">📋 Project Management</option>
+              <option [value]="SkillCategory.COLLABORATION">🤝 Collaboration</option>
+              <option [value]="SkillCategory.LEARNING">📚 Learning</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="skillType">Skill Type</label>
+            <select
+              id="skillType"
+              [(ngModel)]="newItemForm().skillType"
+              name="skillType"
+              class="form-select"
+            >
+              <option [value]="SkillType.HARD_SKILL">🔧 Hard Skill</option>
+              <option [value]="SkillType.SOFT_SKILL">🤝 Soft Skill</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="difficulty">Difficulty</label>
+            <select
+              id="difficulty"
+              [(ngModel)]="newItemForm().difficultyLevel"
+              name="difficulty"
+              class="form-select"
+            >
+              <option [value]="DifficultyLevel.BEGINNER">🟢 Beginner</option>
+              <option [value]="DifficultyLevel.INTERMEDIATE">🟡 Intermediate</option>
+              <option [value]="DifficultyLevel.ADVANCED">🔴 Advanced</option>
+              <option [value]="DifficultyLevel.EXPERT">🟣 Expert</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Duration (minutes)</label>
+            <input
+              id="duration"
+              type="number"
+              [(ngModel)]="newItemForm().estimatedMinutes"
+              name="duration"
+              min="1"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">✅ Create Item</button>
+          <button type="button" class="btn btn-secondary" (click)="closeNewItemForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Tree Node Template -->
+<ng-template #nodeTemplate let-node>
+  <div
+    class="tree-node"
+    [class.selected]="treeState().selectedNode === node"
+    [class.expanded]="node.isExpanded"
+    [class.has-children]="node.children.length > 0"
+    [style.margin-left.px]="node.depth * 24"
+    draggable="true"
+    (dragstart)="onDragStart($event, node)"
+    (dragover)="onDragOver($event)"
+    (drop)="onDrop($event, node)"
+  >
+    <!-- Node Content (View Mode) -->
+    <div class="node-content" *ngIf="!node.isEditing" (click)="selectNode(node)">
+      <!-- Expand/Collapse Button -->
+      <button
+        *ngIf="node.children.length > 0"
+        class="expand-btn"
+        (click)="toggleExpanded(node); $event.stopPropagation()"
+      >
+        <span class="expand-icon">{{ node.isExpanded ? '📂' : '📁' }}</span>
+      </button>
+      <div *ngIf="node.children.length === 0" class="expand-spacer"></div>
+
+      <!-- Category Icon -->
+      <span class="category-icon">{{ getCategoryIcon(node.item.category) }}</span>
+
+      <!-- Title and Info -->
+      <div class="node-info">
+        <div class="node-title">{{ node.item.title }}</div>
+        <div class="node-meta">
+          <span
+            class="skill-type"
+            [class.hard-skill]="node.item.skill_type === SkillType.HARD_SKILL"
+          >
+            {{ node.item.skill_type === SkillType.HARD_SKILL ? '🔧' : '🤝' }}
+          </span>
+          <span class="difficulty">{{ node.item.difficulty_level }}</span>
+          <span class="duration">⏱️ {{ node.item.estimated_duration_minutes }}min</span>
+          <span class="status" [style.color]="getStatusColor(node.item.status)">
+            ● {{ node.item.status.replace('_', ' ') | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width]="getProgressBarWidth(node.item.progress_percentage)"
+            [style.background-color]="getStatusColor(node.item.status)"
+          ></div>
+        </div>
+        <span class="progress-text">{{ node.item.progress_percentage }}%</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="node-actions" (click)="$event.stopPropagation()">
+        <button class="action-btn" (click)="addChildNode(node)" title="Add child item">➕</button>
+        <button class="action-btn" (click)="startEditing(node)" title="Edit item">✏️</button>
+        <button class="action-btn delete-btn" (click)="deleteNode(node)" title="Delete item">
+          🗑️
+        </button>
+      </div>
+    </div>
+
+    <!-- Node Content (Edit Mode) -->
+    <div class="node-edit-form" *ngIf="node.isEditing">
+      <form (ngSubmit)="saveNode(node, nodeForm)" #nodeForm="ngForm">
+        <div class="edit-row">
+          <input
+            type="text"
+            [(ngModel)]="node.item.title"
+            name="title"
+            required
+            class="edit-input title-input"
+            placeholder="Item title..."
+          />
+
+          <select [(ngModel)]="node.item.category" name="category" class="edit-select">
+            <option [value]="SkillCategory.TECHNICAL">💻 Technical</option>
+            <option [value]="SkillCategory.LEADERSHIP">👑 Leadership</option>
+            <option [value]="SkillCategory.COMMUNICATION">💬 Communication</option>
+            <option [value]="SkillCategory.PROBLEM_SOLVING">🧩 Problem Solving</option>
+            <option [value]="SkillCategory.CREATIVITY">🎨 Creativity</option>
+            <option [value]="SkillCategory.PROJECT_MANAGEMENT">📋 Project Management</option>
+            <option [value]="SkillCategory.COLLABORATION">🤝 Collaboration</option>
+            <option [value]="SkillCategory.LEARNING">📚 Learning</option>
+          </select>
+        </div>
+
+        <div class="edit-row">
+          <textarea
+            [(ngModel)]="node.item.description"
+            name="description"
+            class="edit-textarea"
+            placeholder="Description..."
+            rows="2"
+          ></textarea>
+        </div>
+
+        <div class="edit-row">
+          <select [(ngModel)]="node.item.skill_type" name="skillType" class="edit-select">
+            <option [value]="SkillType.HARD_SKILL">🔧 Hard Skill</option>
+            <option [value]="SkillType.SOFT_SKILL">🤝 Soft Skill</option>
+          </select>
+
+          <select
+            [(ngModel)]="node.item.difficulty_level"
+            name="difficultyLevel"
+            class="edit-select"
+          >
+            <option [value]="DifficultyLevel.BEGINNER">🟢 Beginner</option>
+            <option [value]="DifficultyLevel.INTERMEDIATE">🟡 Intermediate</option>
+            <option [value]="DifficultyLevel.ADVANCED">🔴 Advanced</option>
+            <option [value]="DifficultyLevel.EXPERT">🟣 Expert</option>
+          </select>
+
+          <input
+            type="number"
+            [(ngModel)]="node.item.estimated_duration_minutes"
+            name="estimatedMinutes"
+            min="1"
+            class="edit-input duration-input"
+            placeholder="Minutes"
+          />
+        </div>
+
+        <div class="edit-actions">
+          <button type="submit" class="btn btn-sm btn-primary">Save</button>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="cancelEditing(node)">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Progress Update Controls -->
+    <div class="progress-controls" *ngIf="treeState().selectedNode === node && !node.isEditing">
+      <div class="progress-update">
+        <label>Update Progress:</label>
+        <div class="progress-buttons">
+          <button
+            *ngFor="let progress of [0, 25, 50, 75, 100]"
+            class="progress-btn"
+            [class.active]="node.item.progress_percentage === progress"
+            (click)="updateProgress(node, progress)"
+          >
+            {{ progress }}%
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Render Children -->
+  <div class="node-children" *ngIf="node.isExpanded && node.children.length > 0">
+    <ng-container *ngFor="let child of node.children">
+      <div *ngIf="isNodeVisible(child)" class="tree-node-wrapper">
+        <ng-container
+          *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"
+        ></ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>

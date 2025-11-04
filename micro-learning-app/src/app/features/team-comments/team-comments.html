@@ -1,0 +1,310 @@
+<div class="team-comments">
+  <!-- Header with filters and new comment button -->
+  <div class="comments-header">
+    <h3 class="comments-title">
+      <span>Team Comments</span>
+      @if (targetItem()) {
+      <span class="item-context">for "{{ targetItem()?.title }}"</span>
+      }
+    </h3>
+
+    <div class="comments-controls">
+      <!-- Filter controls -->
+      <div class="filter-group">
+        <label>Type:</label>
+        <select (change)="onTypeFilterChange($event)" [value]="commentState().filterByType || ''">
+          <option value="">All Types</option>
+          <option [value]="CommentType.GENERAL">
+            {{ getCommentTypeIcon(CommentType.GENERAL) }} General
+          </option>
+          <option [value]="CommentType.FEEDBACK">
+            {{ getCommentTypeIcon(CommentType.FEEDBACK) }} Feedback
+          </option>
+          <option [value]="CommentType.QUESTION">
+            {{ getCommentTypeIcon(CommentType.QUESTION) }} Question
+          </option>
+          <option [value]="CommentType.SUGGESTION">
+            {{ getCommentTypeIcon(CommentType.SUGGESTION) }} Suggestion
+          </option>
+          <option [value]="CommentType.APPROVAL">
+            {{ getCommentTypeIcon(CommentType.APPROVAL) }} Approval
+          </option>
+          <option [value]="CommentType.CONCERN">
+            {{ getCommentTypeIcon(CommentType.CONCERN) }} Concern
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Visibility:</label>
+        <select
+          (change)="onVisibilityFilterChange($event)"
+          [value]="commentState().filterByVisibility || ''"
+        >
+          <option value="">All Visibility</option>
+          <option [value]="CommentVisibility.PUBLIC">
+            {{ getVisibilityIcon(CommentVisibility.PUBLIC) }} Public
+          </option>
+          <option [value]="CommentVisibility.TEAM">
+            {{ getVisibilityIcon(CommentVisibility.TEAM) }} Team
+          </option>
+          <option [value]="CommentVisibility.PRIVATE">
+            {{ getVisibilityIcon(CommentVisibility.PRIVATE) }} Private
+          </option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="filter-toggle"
+        [class.active]="commentState().showOnlyUnread"
+        (click)="toggleUnreadFilter()"
+      >
+        📬 Unread Only
+      </button>
+
+      <button
+        type="button"
+        class="new-comment-btn"
+        (click)="startNewComment()"
+        [disabled]="!currentUser()"
+      >
+        ➕ New Comment
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (commentState().isLoading) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading comments...</span>
+  </div>
+  }
+
+  <!-- Error state -->
+  @if (commentState().error) {
+  <div class="error-state">
+    <span>⚠️ {{ commentState().error }}</span>
+  </div>
+  }
+
+  <!-- New comment form -->
+  @if (showCommentForm()) {
+  <div class="comment-form-container">
+    <form class="comment-form" (ngSubmit)="submitComment()">
+      <div class="form-header">
+        <h4>@if (newCommentForm().parentCommentId) { Reply to Comment } @else { New Comment }</h4>
+        <button type="button" class="close-btn" (click)="cancelComment()">✕</button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="comment-type">Type:</label>
+          <select id="comment-type" [(ngModel)]="newCommentForm().type" name="type" required>
+            <option [value]="CommentType.GENERAL">
+              {{ getCommentTypeIcon(CommentType.GENERAL) }} General
+            </option>
+            <option [value]="CommentType.FEEDBACK">
+              {{ getCommentTypeIcon(CommentType.FEEDBACK) }} Feedback
+            </option>
+            <option [value]="CommentType.QUESTION">
+              {{ getCommentTypeIcon(CommentType.QUESTION) }} Question
+            </option>
+            <option [value]="CommentType.SUGGESTION">
+              {{ getCommentTypeIcon(CommentType.SUGGESTION) }} Suggestion
+            </option>
+            <option [value]="CommentType.APPROVAL">
+              {{ getCommentTypeIcon(CommentType.APPROVAL) }} Approval
+            </option>
+            <option [value]="CommentType.CONCERN">
+              {{ getCommentTypeIcon(CommentType.CONCERN) }} Concern
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="comment-visibility">Visibility:</label>
+          <select
+            id="comment-visibility"
+            [(ngModel)]="newCommentForm().visibility"
+            name="visibility"
+            required
+          >
+            <option [value]="CommentVisibility.PUBLIC">
+              {{ getVisibilityIcon(CommentVisibility.PUBLIC) }} Public
+            </option>
+            <option [value]="CommentVisibility.TEAM">
+              {{ getVisibilityIcon(CommentVisibility.TEAM) }} Team
+            </option>
+            <option [value]="CommentVisibility.PRIVATE">
+              {{ getVisibilityIcon(CommentVisibility.PRIVATE) }} Private
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="comment-content">Content:</label>
+        <textarea
+          id="comment-content"
+          [(ngModel)]="newCommentForm().content"
+          name="content"
+          placeholder="Enter your comment... Use @username to mention someone"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="newCommentForm().isPrivateNote"
+            name="isPrivateNote"
+          />
+          <span>Private note (only visible to you)</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="cancelComment()">Cancel</button>
+        <button type="submit" class="submit-btn" [disabled]="!newCommentForm().content.trim()">
+          @if (newCommentForm().parentCommentId) { Post Reply } @else { Post Comment }
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+
+  <!-- Comments list -->
+  <div class="comments-list">
+    @if (getFilteredThreads().length === 0 && !commentState().isLoading) {
+    <div class="empty-state">
+      <span>💬 No comments found</span>
+      @if (!currentUser()) {
+      <p>Sign in to view and add comments</p>
+      } @else {
+      <p>Be the first to add a comment!</p>
+      }
+    </div>
+    } @else { @for (thread of getFilteredThreads(); track thread.comment.id) {
+    <div class="comment-thread" [class.selected]="selectedThread() === thread.comment.id">
+      <!-- Main comment -->
+      <div class="comment-item root-comment" (click)="selectThread(thread.comment.id)">
+        <div class="comment-header">
+          <div class="author-info">
+            <span class="author-name">{{ thread.comment.author_id }}</span>
+            <span class="comment-type">{{ getCommentTypeIcon(thread.comment.type) }}</span>
+            <span class="comment-visibility">{{
+              getVisibilityIcon(thread.comment.visibility)
+            }}</span>
+          </div>
+          <div class="comment-meta">
+            <span class="comment-date">{{ formatDate(thread.comment.created_at) }}</span>
+            @if (thread.comment.isUnreadBy(currentUser()?.id || '')) {
+            <span class="unread-indicator">●</span>
+            }
+          </div>
+        </div>
+
+        <div class="comment-content">
+          {{ thread.comment.content }}
+        </div>
+
+        @if (thread.comment.rating) {
+        <div class="comment-rating">
+          Rating: @for (star of [1,2,3,4,5]; track star) {
+          <span [class.filled]="star <= thread.comment.rating">⭐</span>
+          }
+        </div>
+        }
+
+        <div class="comment-actions">
+          @if (canReplyToComment(thread.comment)) {
+          <button
+            type="button"
+            class="action-btn reply-btn"
+            (click)="startNewComment(thread.comment.id); $event.stopPropagation()"
+          >
+            💬 Reply
+          </button>
+          } @if (thread.comment.isUnreadBy(currentUser()?.id || '')) {
+          <button
+            type="button"
+            class="action-btn mark-read-btn"
+            (click)="markAsRead(thread.comment.id); $event.stopPropagation()"
+          >
+            ✓ Mark Read
+          </button>
+          } @if (canDeleteComment(thread.comment)) {
+          <button
+            type="button"
+            class="action-btn delete-btn"
+            (click)="deleteComment(thread.comment.id); $event.stopPropagation()"
+          >
+            🗑️ Delete
+          </button>
+          } @if (thread.replies.length > 0) {
+          <button
+            type="button"
+            class="action-btn expand-btn"
+            (click)="toggleThread(thread.comment.id); $event.stopPropagation()"
+          >
+            @if (thread.isExpanded) { ⬆️ Collapse ({{ thread.replies.length }}) } @else { ⬇️ Expand
+            ({{ thread.replies.length }}) }
+          </button>
+          }
+        </div>
+      </div>
+
+      <!-- Replies -->
+      @if (thread.isExpanded && thread.replies.length > 0) {
+      <div class="replies-container">
+        @for (reply of thread.replies; track reply.id) {
+        <div class="comment-item reply-comment">
+          <div class="comment-header">
+            <div class="author-info">
+              <span class="author-name">{{ reply.author_id }}</span>
+              <span class="comment-type">{{ getCommentTypeIcon(reply.type) }}</span>
+              <span class="comment-visibility">{{ getVisibilityIcon(reply.visibility) }}</span>
+            </div>
+            <div class="comment-meta">
+              <span class="comment-date">{{ formatDate(reply.created_at) }}</span>
+              @if (reply.isUnreadBy(currentUser()?.id || '')) {
+              <span class="unread-indicator">●</span>
+              }
+            </div>
+          </div>
+
+          <div class="comment-content">
+            {{ reply.content }}
+          </div>
+
+          @if (reply.rating) {
+          <div class="comment-rating">
+            Rating: @for (star of [1,2,3,4,5]; track star) {
+            <span [class.filled]="star <= reply.rating">⭐</span>
+            }
+          </div>
+          }
+
+          <div class="comment-actions">
+            @if (reply.isUnreadBy(currentUser()?.id || '')) {
+            <button type="button" class="action-btn mark-read-btn" (click)="markAsRead(reply.id)">
+              ✓ Mark Read
+            </button>
+            } @if (canDeleteComment(reply)) {
+            <button type="button" class="action-btn delete-btn" (click)="deleteComment(reply.id)">
+              🗑️ Delete
+            </button>
+            }
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    } }
+  </div>
+</div>

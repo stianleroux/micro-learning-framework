@@ -1,0 +1,4 @@
+<div class="progress-container" [ngStyle]="containerStyle">
+  <div class="progress-bar" [ngStyle]="progressStyle" [class.animated]="animated"></div>
+  <span *ngIf="showText" class="progress-text">{{ clampedPercentage }}%</span>
+</div>

@@ -1,0 +1,469 @@
+// Variables (inline since no global vars exist yet)
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$error-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$background-color: #ffffff;
+$surface-color: #f8f9fa;
+$text-primary: #333333;
+$text-secondary: #6c757d;
+$border-color: #dee2e6;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Animations
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.roadmap-import-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+
+  .import-header {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+
+    h2 {
+      color: $primary-color;
+      margin-bottom: $spacing-sm;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: 1.1rem;
+    }
+  }
+
+  .import-modes {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+
+    .mode-btn {
+      padding: $spacing-lg;
+      border: 2px solid $border-color;
+      background: $surface-color;
+      border-radius: $border-radius-lg;
+      min-width: 150px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+
+      .mode-icon {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: $spacing-sm;
+      }
+
+      &:hover {
+        border-color: $primary-color;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        border-color: $primary-color;
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+      }
+    }
+  }
+
+  .import-section {
+    background: $surface-color;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xl;
+
+    h3 {
+      color: $primary-color;
+      margin-bottom: $spacing-lg;
+      font-size: 1.5rem;
+    }
+  }
+
+  // Roadmap Grid
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    .roadmap-card {
+      border: 2px solid $border-color;
+      border-radius: $border-radius-md;
+      padding: $spacing-lg;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: $background-color;
+
+      &:hover {
+        border-color: $primary-color;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.1);
+      }
+
+      &.selected {
+        border-color: $primary-color;
+        background: rgba($primary-color, 0.05);
+      }
+
+      .roadmap-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: $spacing-sm;
+        color: $text-primary;
+      }
+
+      .roadmap-description {
+        color: $text-secondary;
+        font-size: 0.9rem;
+        margin-bottom: $spacing-md;
+        line-height: 1.4;
+      }
+
+      .roadmap-url {
+        a {
+          color: $primary-color;
+          text-decoration: none;
+          font-size: 0.8rem;
+          font-weight: 500;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  // File Import
+  .file-import {
+    .csv-format-info,
+    .json-format-info {
+      margin-bottom: $spacing-lg;
+      padding: $spacing-md;
+      background: rgba($info-color, 0.1);
+      border-radius: $border-radius-md;
+      border-left: 4px solid $info-color;
+
+      h4 {
+        margin-bottom: $spacing-sm;
+        color: $info-color;
+        font-size: 1rem;
+      }
+
+      code {
+        display: block;
+        background: $background-color;
+        padding: $spacing-md;
+        border-radius: $border-radius-sm;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        overflow-x: auto;
+        white-space: pre;
+      }
+    }
+
+    .file-upload {
+      margin-bottom: $spacing-lg;
+
+      input[type='file'] {
+        display: none;
+      }
+
+      .file-upload-btn {
+        padding: $spacing-md $spacing-lg;
+        border: 2px solid $secondary-color;
+        background: transparent;
+        color: $secondary-color;
+        border-radius: $border-radius-md;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: $secondary-color;
+          color: white;
+        }
+      }
+    }
+
+    .manual-input {
+      margin-bottom: $spacing-lg;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-sm;
+        font-weight: 500;
+        color: $text-primary;
+      }
+
+      textarea {
+        width: 100%;
+        padding: $spacing-md;
+        border: 2px solid $border-color;
+        border-radius: $border-radius-md;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        resize: vertical;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+        }
+      }
+    }
+
+    .csv-preview {
+      margin-bottom: $spacing-lg;
+
+      h4 {
+        margin-bottom: $spacing-sm;
+        color: $text-primary;
+      }
+
+      pre {
+        background: $background-color;
+        padding: $spacing-md;
+        border-radius: $border-radius-md;
+        border: 1px solid $border-color;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        overflow-x: auto;
+      }
+    }
+  }
+
+  // Import Actions
+  .import-actions {
+    display: flex;
+    gap: $spacing-md;
+    justify-content: flex-start;
+
+    .btn {
+      padding: $spacing-md $spacing-lg;
+      border: 2px solid;
+      border-radius: $border-radius-md;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      &.btn-primary {
+        background: $primary-color;
+        border-color: $primary-color;
+        color: white;
+
+        &:hover {
+          background: #0056b3;
+          border-color: #0056b3;
+        }
+      }
+
+      &.btn-secondary {
+        background: transparent;
+        border-color: $secondary-color;
+        color: $secondary-color;
+
+        &:hover {
+          background: $secondary-color;
+          color: white;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // Import Results
+  .import-results {
+    background: $surface-color;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-lg;
+
+      h3 {
+        color: $primary-color;
+        margin: 0;
+      }
+
+      .btn-sm {
+        padding: $spacing-sm $spacing-md;
+        font-size: 0.8rem;
+      }
+    }
+
+    .result-content {
+      &.success {
+        border-left: 4px solid $success-color;
+        background: rgba($success-color, 0.05);
+      }
+
+      &.error {
+        border-left: 4px solid $error-color;
+        background: rgba($error-color, 0.05);
+      }
+
+      padding: $spacing-lg;
+      border-radius: $border-radius-md;
+
+      .result-status {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-md;
+
+        .status-icon {
+          font-size: 1.2rem;
+        }
+
+        .status-text {
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+      }
+
+      .result-stats {
+        margin-bottom: $spacing-md;
+
+        .stat {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: $spacing-sm 0;
+
+          .stat-label {
+            font-weight: 500;
+          }
+
+          .stat-value {
+            font-weight: 600;
+            color: $primary-color;
+          }
+        }
+      }
+
+      .result-errors {
+        h4 {
+          color: $error-color;
+          margin-bottom: $spacing-sm;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: $spacing-lg;
+
+          li {
+            color: $error-color;
+            margin-bottom: $spacing-xs;
+          }
+        }
+      }
+    }
+  }
+
+  // Loading Overlay
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba($background-color, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .loading-content {
+      background: $surface-color;
+      padding: $spacing-xl;
+      border-radius: $border-radius-lg;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid $primary-color;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto $spacing-md;
+      }
+
+      p {
+        margin: 0;
+        color: $text-secondary;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .roadmap-import-container {
+    padding: $spacing-md;
+
+    .import-modes {
+      flex-direction: column;
+      align-items: center;
+
+      .mode-btn {
+        min-width: 200px;
+      }
+    }
+
+    .roadmap-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .import-actions {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    .result-header {
+      flex-direction: column;
+      gap: $spacing-md;
+      align-items: flex-start;
+    }
+  }
+}

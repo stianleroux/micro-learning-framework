@@ -1,0 +1,40 @@
+# Cloudflare Pages Build Configuration
+
+# Build settings
+build:
+  command: npm run build
+  directory: micro-learning-app
+  output: dist/micro-learning-app/browser
+
+# Environment variables (set in Cloudflare Dashboard)
+environment:
+  NODE_VERSION: "18"
+  SUPABASE_URL: $SUPABASE_URL
+  SUPABASE_ANON_KEY: $SUPABASE_ANON_KEY
+
+# Redirects for SPA routing
+redirects:
+  - from: "/*"
+    to: "/index.html"
+    status: 200
+
+# Security headers
+headers:
+  - for: "/*"
+    values:
+      X-Frame-Options: "DENY"
+      X-Content-Type-Options: "nosniff"
+      Referrer-Policy: "strict-origin-when-cross-origin"
+      Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+      
+  - for: "/service-worker.js"
+    values:
+      Cache-Control: "public, max-age=0, must-revalidate"
+
+# Functions (if using Cloudflare Workers)
+functions:
+  - name: "notification-scheduler"
+    script: "functions/notification-scheduler.js"
+    environment:
+      SUPABASE_URL: $SUPABASE_URL
+      SUPABASE_SERVICE_KEY: $SUPABASE_SERVICE_KEY

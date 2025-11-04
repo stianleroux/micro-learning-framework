@@ -1,0 +1,715 @@
+// Variables
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$error-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$background-color: #ffffff;
+$surface-color: #f8f9fa;
+$text-primary: #333333;
+$text-secondary: #6c757d;
+$border-color: #dee2e6;
+$hover-color: #f1f3f4;
+$selected-color: #e3f2fd;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+  }
+}
+
+.learning-tree-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  background: $background-color;
+  min-height: 100vh;
+
+  .tree-header {
+    background: linear-gradient(135deg, $primary-color, #0056b3);
+    color: white;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xl;
+
+    .header-content {
+      margin-bottom: $spacing-lg;
+
+      h2 {
+        margin: 0 0 $spacing-sm 0;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+    }
+
+    .tree-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+      align-items: center;
+
+      .search-box {
+        position: relative;
+
+        .search-input {
+          padding: $spacing-sm $spacing-md $spacing-sm 2.5rem;
+          border: 2px solid rgba(white, 0.2);
+          border-radius: $border-radius-md;
+          background: rgba(white, 0.1);
+          color: white;
+          font-size: 1rem;
+          min-width: 250px;
+
+          &::placeholder {
+            color: rgba(white, 0.7);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: rgba(white, 0.5);
+            background: rgba(white, 0.15);
+          }
+        }
+
+        .search-icon {
+          position: absolute;
+          left: $spacing-sm;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.2rem;
+          opacity: 0.7;
+        }
+      }
+
+      .filter-controls {
+        display: flex;
+        gap: $spacing-md;
+        align-items: center;
+
+        .category-filter {
+          padding: $spacing-sm $spacing-md;
+          border: 2px solid rgba(white, 0.2);
+          border-radius: $border-radius-md;
+          background: rgba(white, 0.1);
+          color: white;
+          font-size: 0.9rem;
+
+          &:focus {
+            outline: none;
+            border-color: rgba(white, 0.5);
+          }
+
+          option {
+            background: $background-color;
+            color: $text-primary;
+          }
+        }
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: 0.9rem;
+          cursor: pointer;
+
+          input[type='checkbox'] {
+            accent-color: white;
+          }
+        }
+      }
+
+      .add-root-btn {
+        background: rgba(white, 0.15);
+        border: 2px solid rgba(white, 0.3);
+        color: white;
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius-md;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(white, 0.25);
+          border-color: rgba(white, 0.5);
+        }
+      }
+    }
+  }
+
+  .tree-content {
+    background: $surface-color;
+    border-radius: $border-radius-lg;
+    min-height: 500px;
+
+    .tree-nodes {
+      padding: $spacing-md;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-xl * 2;
+      text-align: center;
+
+      .empty-icon {
+        font-size: 4rem;
+        margin-bottom: $spacing-lg;
+        opacity: 0.6;
+      }
+
+      h3 {
+        color: $text-primary;
+        margin-bottom: $spacing-sm;
+      }
+
+      p {
+        color: $text-secondary;
+        margin-bottom: $spacing-xl;
+      }
+
+      .empty-actions {
+        display: flex;
+        gap: $spacing-md;
+
+        .btn {
+          padding: $spacing-md $spacing-lg;
+          border-radius: $border-radius-md;
+          text-decoration: none;
+          font-weight: 500;
+          cursor: pointer;
+
+          &.btn-primary {
+            background: $primary-color;
+            border: 2px solid $primary-color;
+            color: white;
+
+            &:hover {
+              background: #0056b3;
+            }
+          }
+
+          &.btn-secondary {
+            background: transparent;
+            border: 2px solid $secondary-color;
+            color: $secondary-color;
+
+            &:hover {
+              background: $secondary-color;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Tree Nodes
+  .tree-node-wrapper {
+    margin-bottom: $spacing-xs;
+
+    .tree-node {
+      background: $background-color;
+      border: 2px solid transparent;
+      border-radius: $border-radius-md;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &:hover {
+        background: $hover-color;
+        border-color: $border-color;
+      }
+
+      &.selected {
+        background: $selected-color;
+        border-color: $primary-color;
+      }
+
+      &.has-children {
+        .node-content {
+          cursor: pointer;
+        }
+      }
+
+      .node-content {
+        display: flex;
+        align-items: center;
+        padding: $spacing-md;
+        gap: $spacing-sm;
+
+        .expand-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: $spacing-xs;
+          border-radius: $border-radius-sm;
+
+          &:hover {
+            background: rgba($primary-color, 0.1);
+          }
+
+          .expand-icon {
+            font-size: 1.2rem;
+          }
+        }
+
+        .expand-spacer {
+          width: 24px;
+        }
+
+        .category-icon {
+          font-size: 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+        }
+
+        .node-info {
+          flex: 1;
+          min-width: 0;
+
+          .node-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: $text-primary;
+            margin-bottom: $spacing-xs;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .node-meta {
+            display: flex;
+            gap: $spacing-md;
+            font-size: 0.8rem;
+            color: $text-secondary;
+            align-items: center;
+
+            .skill-type {
+              &.hard-skill {
+                color: $primary-color;
+              }
+            }
+
+            .difficulty {
+              text-transform: capitalize;
+            }
+
+            .status {
+              font-weight: 500;
+            }
+          }
+        }
+
+        .progress-container {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          min-width: 120px;
+
+          .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: $border-color;
+            border-radius: 4px;
+            overflow: hidden;
+
+            .progress-fill {
+              height: 100%;
+              transition: width 0.3s ease;
+            }
+          }
+
+          .progress-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: $text-secondary;
+            min-width: 35px;
+          }
+        }
+
+        .node-actions {
+          display: flex;
+          gap: $spacing-xs;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+
+          .action-btn {
+            background: none;
+            border: 1px solid $border-color;
+            padding: $spacing-xs;
+            border-radius: $border-radius-sm;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: $text-secondary;
+
+            &:hover {
+              background: $hover-color;
+              color: $text-primary;
+            }
+
+            &.delete-btn:hover {
+              background: rgba($error-color, 0.1);
+              border-color: $error-color;
+              color: $error-color;
+            }
+          }
+        }
+      }
+
+      &:hover .node-actions {
+        opacity: 1;
+      }
+
+      // Edit Mode
+      .node-edit-form {
+        padding: $spacing-md;
+        background: $hover-color;
+
+        .edit-row {
+          display: flex;
+          gap: $spacing-sm;
+          margin-bottom: $spacing-sm;
+
+          .edit-input,
+          .edit-select,
+          .edit-textarea {
+            padding: $spacing-xs $spacing-sm;
+            border: 1px solid $border-color;
+            border-radius: $border-radius-sm;
+            font-size: 0.9rem;
+
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+            }
+          }
+
+          .title-input {
+            flex: 2;
+          }
+
+          .duration-input {
+            max-width: 80px;
+          }
+
+          .edit-textarea {
+            flex: 1;
+            resize: vertical;
+          }
+        }
+
+        .edit-actions {
+          display: flex;
+          gap: $spacing-sm;
+
+          .btn {
+            padding: $spacing-xs $spacing-md;
+            border-radius: $border-radius-sm;
+            font-size: 0.8rem;
+            cursor: pointer;
+
+            &.btn-primary {
+              background: $primary-color;
+              border: 1px solid $primary-color;
+              color: white;
+            }
+
+            &.btn-secondary {
+              background: transparent;
+              border: 1px solid $secondary-color;
+              color: $secondary-color;
+            }
+          }
+        }
+      }
+
+      // Progress Controls
+      .progress-controls {
+        padding: $spacing-md;
+        background: rgba($primary-color, 0.05);
+        border-top: 1px solid $border-color;
+        animation: slideDown 0.3s ease;
+
+        .progress-update {
+          label {
+            display: block;
+            margin-bottom: $spacing-sm;
+            font-weight: 500;
+            color: $text-primary;
+            font-size: 0.9rem;
+          }
+
+          .progress-buttons {
+            display: flex;
+            gap: $spacing-xs;
+
+            .progress-btn {
+              padding: $spacing-xs $spacing-sm;
+              border: 1px solid $border-color;
+              background: $background-color;
+              border-radius: $border-radius-sm;
+              cursor: pointer;
+              font-size: 0.8rem;
+              color: $text-secondary;
+              transition: all 0.2s ease;
+
+              &:hover {
+                background: $hover-color;
+                color: $text-primary;
+              }
+
+              &.active {
+                background: $primary-color;
+                border-color: $primary-color;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .node-children {
+      margin-top: $spacing-xs;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: $border-color;
+      }
+    }
+  }
+
+  // Modal Styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+
+    .modal-content {
+      background: $background-color;
+      border-radius: $border-radius-lg;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $spacing-lg;
+        border-bottom: 1px solid $border-color;
+
+        h3 {
+          margin: 0;
+          color: $text-primary;
+        }
+
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: $text-secondary;
+          padding: $spacing-xs;
+          border-radius: $border-radius-sm;
+
+          &:hover {
+            background: $hover-color;
+            color: $text-primary;
+          }
+        }
+      }
+
+      .new-item-form {
+        padding: $spacing-lg;
+
+        .form-group {
+          margin-bottom: $spacing-md;
+
+          label {
+            display: block;
+            margin-bottom: $spacing-xs;
+            font-weight: 500;
+            color: $text-primary;
+          }
+
+          .form-input,
+          .form-select,
+          .form-textarea {
+            width: 100%;
+            padding: $spacing-sm;
+            border: 2px solid $border-color;
+            border-radius: $border-radius-md;
+            font-size: 1rem;
+
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+            }
+          }
+
+          .form-textarea {
+            resize: vertical;
+          }
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: $spacing-md;
+
+          .form-group {
+            margin-bottom: $spacing-md;
+          }
+        }
+
+        .form-actions {
+          display: flex;
+          gap: $spacing-md;
+          justify-content: flex-end;
+          margin-top: $spacing-lg;
+          padding-top: $spacing-lg;
+          border-top: 1px solid $border-color;
+
+          .btn {
+            padding: $spacing-sm $spacing-lg;
+            border-radius: $border-radius-md;
+            font-weight: 500;
+            cursor: pointer;
+
+            &.btn-primary {
+              background: $primary-color;
+              border: 2px solid $primary-color;
+              color: white;
+
+              &:hover {
+                background: #0056b3;
+              }
+            }
+
+            &.btn-secondary {
+              background: transparent;
+              border: 2px solid $secondary-color;
+              color: $secondary-color;
+
+              &:hover {
+                background: $secondary-color;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .learning-tree-container {
+    .tree-header .tree-controls {
+      flex-direction: column;
+      align-items: stretch;
+
+      .search-box .search-input {
+        min-width: 100%;
+      }
+
+      .filter-controls {
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .learning-tree-container {
+    padding: $spacing-md;
+
+    .tree-header {
+      padding: $spacing-lg;
+
+      .tree-controls {
+        .filter-controls {
+          flex-direction: column;
+          align-items: stretch;
+          gap: $spacing-sm;
+        }
+      }
+    }
+
+    .tree-node {
+      .node-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: $spacing-sm;
+
+        .node-info,
+        .progress-container {
+          min-width: 100%;
+        }
+      }
+    }
+
+    .modal-overlay .modal-content {
+      width: 95%;
+      margin: $spacing-md;
+
+      .new-item-form .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

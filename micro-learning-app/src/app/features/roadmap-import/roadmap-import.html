@@ -1,0 +1,358 @@
+<div class="roadmap-import-container">
+  <div class="import-header">
+    <h2>Import Learning Roadmaps</h2>
+    <p>Import structured learning paths from roadmap.sh, CSV files, or JSON data</p>
+  </div>
+
+  <!-- Import Mode Selection -->
+  <div class="import-modes">
+    <button
+      class="mode-btn"
+      [class.active]="importState().importMode === 'roadmap'"
+      (click)="selectImportMode('roadmap')"
+    >
+      <span class="mode-icon">🗺️</span>
+      Roadmap.sh
+    </button>
+    <button
+      class="mode-btn"
+      [class.active]="importState().importMode === 'speckit-csv'"
+      (click)="selectImportMode('speckit-csv')"
+    >
+      <span class="mode-icon">�</span>
+      Speckit CSV
+    </button>
+    <button
+      class="mode-btn"
+      [class.active]="importState().importMode === 'speckit-json'"
+      (click)="selectImportMode('speckit-json')"
+    >
+      <span class="mode-icon">�</span>
+      Speckit JSON
+    </button>
+    <button
+      class="mode-btn"
+      [class.active]="importState().importMode === 'generic-csv'"
+      (click)="selectImportMode('generic-csv')"
+    >
+      <span class="mode-icon">📄</span>
+      Generic CSV
+    </button>
+  </div>
+
+  <!-- Roadmap.sh Import -->
+  <div class="import-section" *ngIf="importState().importMode === 'roadmap'">
+    <h3>Select Roadmap</h3>
+    <div class="roadmap-grid">
+      <div
+        *ngFor="let roadmap of availableRoadmaps()"
+        class="roadmap-card"
+        [class.selected]="importState().selectedRoadmap === roadmap.id"
+        (click)="selectRoadmap(roadmap.id)"
+      >
+        <div class="roadmap-title">{{ roadmap.title }}</div>
+        <div class="roadmap-description">{{ roadmap.description }}</div>
+        <div class="roadmap-url">
+          <a [href]="roadmap.url" target="_blank" rel="noopener"> View Original → </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="import-actions" *ngIf="importState().selectedRoadmap">
+      <button
+        class="btn btn-primary"
+        [disabled]="importState().isLoading"
+        (click)="importSelectedRoadmap()"
+      >
+        <span *ngIf="importState().isLoading">Importing...</span>
+        <span *ngIf="!importState().isLoading">Import Roadmap</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Speckit CSV Import -->
+  <div class="import-section" *ngIf="importState().importMode === 'speckit-csv'">
+    <h3>Speckit CSV Import</h3>
+    <p>
+      Import structured learning plans in Speckit CSV format with weekly breakdown and
+      micro-learning sessions.
+    </p>
+
+    <div class="file-import">
+      <div class="csv-format-info">
+        <h4>Expected Speckit CSV Format:</h4>
+        <code>
+          learning_plan_title,week,day,session_title,content_type,duration_minutes,description,resources<br />
+          "C# SOLID Principles",1,1,"Single Responsibility Principle",theory,30,"Learn SRP
+          basics","docs.microsoft.com/dotnet"<br />
+          "C# SOLID Principles",1,2,"SRP Practice",hands_on,45,"Implement SRP
+          examples","github.com/examples"
+        </code>
+
+        <div class="sample-actions">
+          <button class="btn btn-outline" (click)="toggleSampleData()">
+            {{ importState().showSampleData ? 'Hide' : 'Show' }} Sample Data
+          </button>
+          <button class="btn btn-outline" (click)="loadSampleCSV()">Load Sample CSV</button>
+        </div>
+
+        <div class="sample-data" *ngIf="importState().showSampleData">
+          <h5>Sample Learning Plan Structure:</h5>
+          <ul>
+            <li>
+              <strong>learning_plan_title:</strong> Overall title for the learning plan (e.g., "C#
+              SOLID Principles")
+            </li>
+            <li><strong>week:</strong> Week number in the learning plan (1-52)</li>
+            <li><strong>day:</strong> Day number within the week (1-7)</li>
+            <li><strong>session_title:</strong> Title of the specific learning session</li>
+            <li>
+              <strong>content_type:</strong> Type of content (theory, hands_on, assessment, review)
+            </li>
+            <li><strong>duration_minutes:</strong> Expected time to complete (15-120 minutes)</li>
+            <li><strong>description:</strong> Detailed description of the session content</li>
+            <li><strong>resources:</strong> Links or references for additional materials</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="file-upload">
+        <input
+          type="file"
+          accept=".csv"
+          id="speckit-csv-file"
+          (change)="onFileSelected($event, 'csv')"
+        />
+        <label for="speckit-csv-file" class="file-upload-btn"> Choose Speckit CSV File </label>
+      </div>
+
+      <div class="manual-input">
+        <label for="speckit-csv-content">Or paste Speckit CSV content:</label>
+        <textarea
+          id="speckit-csv-content"
+          [(ngModel)]="importState().csvContent"
+          placeholder="Paste your Speckit CSV content here..."
+          rows="10"
+        >
+        </textarea>
+      </div>
+
+      <div class="csv-preview" *ngIf="importState().csvContent">
+        <h4>CSV Content Preview:</h4>
+        <pre
+          >{{ importState().csvContent.split('\n').slice(0, 5).join('\n')
+          }}{{ importState().csvContent.split('\n').length > 5 ? '\n...' : '' }}</pre
+        >
+      </div>
+
+      <div class="import-actions" *ngIf="importState().csvContent">
+        <button
+          class="btn btn-primary"
+          [disabled]="importState().isLoading"
+          (click)="importSpeckitCSV()"
+        >
+          <span *ngIf="importState().isLoading">Importing...</span>
+          <span *ngIf="!importState().isLoading">Import Speckit CSV</span>
+        </button>
+        <button class="btn btn-secondary" (click)="clearCSVContent()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic CSV Import -->
+  <div class="import-section" *ngIf="importState().importMode === 'generic-csv'">
+    <h3>Generic CSV Import</h3>
+    <p>Import training items from a simple CSV format.</p>
+
+    <div class="file-import">
+      <div class="csv-format-info">
+        <h4>Expected Generic CSV Format:</h4>
+        <code>
+          title,description,category,skill_type,level,minutes<br />
+          "Angular Basics","Learn Angular fundamentals",technical,hard_skill,beginner,120<br />
+          "Team Leadership","Develop leadership skills",leadership,soft_skill,intermediate,180
+        </code>
+      </div>
+
+      <div class="file-upload">
+        <input
+          type="file"
+          accept=".csv"
+          id="generic-csv-file"
+          (change)="onFileSelected($event, 'csv')"
+        />
+        <label for="generic-csv-file" class="file-upload-btn"> Choose CSV File </label>
+      </div>
+
+      <div class="manual-input">
+        <label for="generic-csv-content">Or paste CSV content:</label>
+        <textarea
+          id="generic-csv-content"
+          [(ngModel)]="importState().csvContent"
+          placeholder="Paste your CSV content here..."
+          rows="8"
+        >
+        </textarea>
+      </div>
+
+      <div class="csv-preview" *ngIf="importState().csvContent">
+        <h4>CSV Content Preview:</h4>
+        <pre
+          >{{ importState().csvContent.split('\n').slice(0, 5).join('\n')
+          }}{{ importState().csvContent.split('\n').length > 5 ? '\n...' : '' }}</pre
+        >
+      </div>
+
+      <div class="import-actions" *ngIf="importState().csvContent">
+        <button
+          class="btn btn-primary"
+          [disabled]="importState().isLoading"
+          (click)="importSpeckitCSV()"
+        >
+          <span *ngIf="importState().isLoading">Importing...</span>
+          <span *ngIf="!importState().isLoading">Import from CSV</span>
+        </button>
+        <button class="btn btn-secondary" (click)="clearCSVContent()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Speckit JSON Import -->
+  <div class="import-section" *ngIf="importState().importMode === 'speckit-json'">
+    <h3>Speckit JSON Import</h3>
+    <p>
+      Import structured learning plans in Speckit JSON format with detailed metadata and scheduling.
+    </p>
+
+    <div class="file-import">
+      <div class="json-format-info">
+        <h4>Expected Speckit JSON Format:</h4>
+        <code>
+          {{ '{' }}<br />
+          &nbsp;&nbsp;"title": "C# SOLID Principles Learning Plan",<br />
+          &nbsp;&nbsp;"description": "Master SOLID principles in C#",<br />
+          &nbsp;&nbsp;"totalWeeks": 2,<br />
+          &nbsp;&nbsp;"estimatedHours": 10,<br />
+          &nbsp;&nbsp;"difficulty": "intermediate",<br />
+          &nbsp;&nbsp;"weeks": [{{ '{' }}<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;"weekNumber": 1,<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;"theme": "Basic Principles",<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;"days": [...]<br />
+          &nbsp;&nbsp;{{ '}' }}]<br />
+          {{ '}' }}
+        </code>
+
+        <div class="sample-actions">
+          <button class="btn btn-outline" (click)="toggleSampleData()">
+            {{ importState().showSampleData ? 'Hide' : 'Show' }} Sample Data
+          </button>
+          <button class="btn btn-outline" (click)="loadSampleJSON()">Load Sample JSON</button>
+        </div>
+
+        <div class="sample-data" *ngIf="importState().showSampleData">
+          <h5>Complete Speckit JSON Structure:</h5>
+          <ul>
+            <li><strong>title:</strong> Learning plan title</li>
+            <li><strong>description:</strong> Detailed plan description</li>
+            <li><strong>totalWeeks:</strong> Number of weeks in the plan</li>
+            <li><strong>estimatedHours:</strong> Total estimated completion time</li>
+            <li>
+              <strong>difficulty:</strong> Difficulty level (beginner, intermediate, advanced)
+            </li>
+            <li><strong>weeks:</strong> Array of weekly learning modules</li>
+            <li><strong>weeks[].weekNumber:</strong> Week sequence number</li>
+            <li><strong>weeks[].theme:</strong> Weekly learning theme</li>
+            <li><strong>weeks[].days:</strong> Array of daily sessions within the week</li>
+            <li><strong>days[].dayNumber:</strong> Day sequence within week</li>
+            <li><strong>days[].sessions:</strong> Learning sessions for that day</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="file-upload">
+        <input
+          type="file"
+          accept=".json"
+          id="speckit-json-file"
+          (change)="onFileSelected($event, 'json')"
+        />
+        <label for="speckit-json-file" class="file-upload-btn"> Choose Speckit JSON File </label>
+      </div>
+
+      <div class="manual-input">
+        <label for="speckit-json-content">Or paste Speckit JSON content:</label>
+        <textarea
+          id="speckit-json-content"
+          [(ngModel)]="importState().jsonContent"
+          placeholder="Paste your Speckit JSON content here..."
+          rows="12"
+        >
+        </textarea>
+      </div>
+
+      <div class="json-preview" *ngIf="importState().jsonContent">
+        <h4>JSON Content Preview:</h4>
+        <pre
+          >{{ importState().jsonContent.substring(0, 500)
+          }}{{ importState().jsonContent.length > 500 ? '...' : '' }}</pre
+        >
+      </div>
+
+      <div class="import-actions" *ngIf="importState().jsonContent">
+        <button
+          class="btn btn-primary"
+          [disabled]="importState().isLoading"
+          (click)="importSpeckitJSON()"
+        >
+          <span *ngIf="importState().isLoading">Importing...</span>
+          <span *ngIf="!importState().isLoading">Import Speckit JSON</span>
+        </button>
+        <button class="btn btn-secondary" (click)="clearJSONContent()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Results -->
+  <div class="import-results" *ngIf="importState().lastResult">
+    <div class="result-header">
+      <h3>Import Results</h3>
+      <button class="btn btn-secondary btn-sm" (click)="clearResults()">Clear</button>
+    </div>
+
+    <div
+      class="result-content"
+      [class.success]="importState().lastResult!.success"
+      [class.error]="!importState().lastResult!.success"
+    >
+      <div class="result-status">
+        <span class="status-icon" *ngIf="importState().lastResult!.success">✅</span>
+        <span class="status-icon" *ngIf="!importState().lastResult!.success">❌</span>
+        <span class="status-text">
+          {{ importState().lastResult!.success ? 'Success' : 'Failed' }}
+        </span>
+      </div>
+
+      <div class="result-stats">
+        <div class="stat">
+          <span class="stat-label">Items Imported:</span>
+          <span class="stat-value">{{ importState().lastResult!.itemsImported }}</span>
+        </div>
+      </div>
+
+      <div class="result-errors" *ngIf="importState().lastResult!.errors.length > 0">
+        <h4>Errors:</h4>
+        <ul>
+          <li *ngFor="let error of importState().lastResult!.errors">{{ error }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="importState().isLoading">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Processing import...</p>
+    </div>
+  </div>
+</div>

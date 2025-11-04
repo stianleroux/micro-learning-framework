@@ -1,0 +1,208 @@
+<div class="dashboard-container" *ngIf="currentUser">
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <div class="user-greeting">
+      <h1>Welcome back, {{ currentUser.getDisplayName() }}!</h1>
+      <p class="greeting-subtitle">Ready for your next learning session?</p>
+    </div>
+
+    <div class="quick-actions">
+      <button class="btn btn-primary quick-practice" (click)="quickPractice()">
+        <span class="icon">🎯</span>
+        Quick Practice (15min)
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <section class="stats-overview">
+    <div class="stat-card">
+      <div class="stat-value">{{ todayProgress }}</div>
+      <div class="stat-label">Today's Sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ weeklyCompleted }}/{{ weeklyGoal }}</div>
+      <div class="stat-label">Weekly Goal</div>
+      <app-progress-bar
+        [percentage]="(weeklyCompleted / weeklyGoal) * 100"
+        color="#28a745"
+        height="4px"
+      ></app-progress-bar>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ streakDays }}</div>
+      <div class="stat-label">Day Streak</div>
+    </div>
+  </section>
+
+  <!-- Current Focus -->
+  <section class="current-focus">
+    <h2>Current Focus</h2>
+    <div class="focus-grid">
+      <!-- Hard Skill -->
+      <div class="focus-section">
+        <h3>
+          <span class="focus-icon">🔧</span>
+          Hard Skill
+        </h3>
+        <div *ngIf="currentHardSkill$ | async as hardSkill; else noHardSkill">
+          <app-skill-card
+            [skill]="hardSkill"
+            (skillClick)="onSkillCardClick($event)"
+            (practiceClick)="onSkillCardClick($event)"
+          >
+          </app-skill-card>
+        </div>
+        <ng-template #noHardSkill>
+          <div class="no-skill-card">
+            <p>No hard skill currently selected</p>
+            <button class="btn btn-outline">Browse Skills</button>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Soft Skill -->
+      <div class="focus-section">
+        <h3>
+          <span class="focus-icon">🧠</span>
+          Soft Skill
+        </h3>
+        <div *ngIf="currentSoftSkill$ | async as softSkill; else noSoftSkill">
+          <app-skill-card
+            [skill]="softSkill"
+            (skillClick)="onSkillCardClick($event)"
+            (practiceClick)="onSkillCardClick($event)"
+          >
+          </app-skill-card>
+        </div>
+        <ng-template #noSoftSkill>
+          <div class="no-skill-card">
+            <p>No soft skill currently selected</p>
+            <button class="btn btn-outline">Browse Skills</button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+
+  <!-- My Why & About Section -->
+  <section class="profile-section">
+    <h2>
+      My Why & About
+      <button
+        class="btn btn-link edit-btn"
+        (click)="startEditingProfile()"
+        *ngIf="!isEditingProfile"
+      >
+        Edit
+      </button>
+    </h2>
+
+    <div *ngIf="!isEditingProfile" class="profile-display">
+      <div class="profile-item">
+        <h4>My Why</h4>
+        <p *ngIf="currentUser.my_why; else noWhy">{{ currentUser.my_why }}</p>
+        <ng-template #noWhy>
+          <p class="placeholder">Share why learning and development is important to you...</p>
+        </ng-template>
+      </div>
+
+      <div class="profile-item">
+        <h4>About Me</h4>
+        <p *ngIf="currentUser.about_me; else noAbout">{{ currentUser.about_me }}</p>
+        <ng-template #noAbout>
+          <p class="placeholder">Tell us about your background and interests...</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <div *ngIf="isEditingProfile" class="profile-edit">
+      <div class="form-group">
+        <label for="myWhy">My Why</label>
+        <textarea
+          id="myWhy"
+          [(ngModel)]="editProfile.my_why"
+          placeholder="Why is learning and development important to you?"
+          rows="3"
+        >
+        </textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="aboutMe">About Me</label>
+        <textarea
+          id="aboutMe"
+          [(ngModel)]="editProfile.about_me"
+          placeholder="Tell us about your background, interests, and goals..."
+          rows="3"
+        >
+        </textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="hardSkill">Current Hard Skill Focus</label>
+          <input
+            id="hardSkill"
+            type="text"
+            [(ngModel)]="editProfile.current_hard_skill"
+            placeholder="e.g., Angular, Docker, Python"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="softSkill">Current Soft Skill Focus</label>
+          <input
+            id="softSkill"
+            type="text"
+            [(ngModel)]="editProfile.current_soft_skill"
+            placeholder="e.g., Communication, Leadership"
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" (click)="saveProfile()">Save Changes</button>
+        <button class="btn btn-outline" (click)="cancelEditProfile()">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="recent-activity">
+    <h2>Recent Activity</h2>
+    <div *ngIf="recentActivity$ | async as activities; else noActivity" class="activity-list">
+      <div *ngFor="let activity of activities" class="activity-item">
+        <div class="activity-icon">
+          <span *ngIf="activity.isCompleted()">✅</span>
+          <span *ngIf="!activity.isCompleted()">📚</span>
+        </div>
+        <div class="activity-content">
+          <h4>{{ activity.title }}</h4>
+          <p>{{ activity.progress_percentage }}% complete</p>
+          <span class="activity-time">{{ getLastPracticeText(activity) }}</span>
+        </div>
+        <div class="activity-progress">
+          <app-progress-bar
+            [percentage]="activity.progress_percentage"
+            [color]="activity.isCompleted() ? '#28a745' : '#007bff'"
+            height="6px"
+          >
+          </app-progress-bar>
+        </div>
+      </div>
+    </div>
+    <ng-template #noActivity>
+      <div class="no-activity">
+        <p>No recent activity. Start your first learning session!</p>
+        <button class="btn btn-primary" (click)="quickPractice()">Start Learning</button>
+      </div>
+    </ng-template>
+  </section>
+</div>
+
+<!-- Loading state -->
+<div *ngIf="!currentUser" class="loading-state">
+  <div class="spinner"></div>
+  <p>Loading your dashboard...</p>
+</div>
